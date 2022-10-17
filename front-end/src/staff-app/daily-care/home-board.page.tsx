@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext, memo } from "react"
 import styled from "styled-components"
 import Button from "@material-ui/core/ButtonBase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+
 import { Spacing, BorderRadius, FontWeight } from "shared/styles/styles"
 import { Colors } from "shared/styles/colors"
 import { CenteredContainer } from "shared/components/centered-container/centered-container.component"
@@ -9,14 +10,25 @@ import { Person } from "shared/models/person"
 import { useApi } from "shared/hooks/use-api"
 import { StudentListTile } from "staff-app/components/student-list-tile/student-list-tile.component"
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
+import { OperationsHandlerContext } from "./daily-staff.context"
 
-export const HomeBoardPage: React.FC = () => {
+export const HomeBoardPage: React.FC = memo(() => {
   const [isRollMode, setIsRollMode] = useState(false)
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
+  const [studentsData, setStudentsData] = useState<Person[] | undefined>([])
+  const { updateGlobalStudentsData, setStudentsDataDispatchAction } = useContext(OperationsHandlerContext)
 
   useEffect(() => {
     void getStudents()
   }, [getStudents])
+
+  useEffect(() => {
+    if (loadState === "loaded") {
+      setStudentsData(data?.students)
+      updateGlobalStudentsData(data?.students || [])
+      setStudentsDataDispatchAction(setStudentsData)
+    }
+  }, [loadState])
 
   const onToolbarAction = (action: ToolbarAction) => {
     if (action === "roll") {
@@ -41,9 +53,9 @@ export const HomeBoardPage: React.FC = () => {
           </CenteredContainer>
         )}
 
-        {loadState === "loaded" && data?.students && (
+        {loadState === "loaded" && studentsData && (
           <>
-            {data.students.map((s) => (
+            {studentsData.map((s) => (
               <StudentListTile key={s.id} isRollMode={isRollMode} student={s} />
             ))}
           </>
@@ -58,7 +70,7 @@ export const HomeBoardPage: React.FC = () => {
       <ActiveRollOverlay isActive={isRollMode} onItemClick={onActiveRollAction} />
     </>
   )
-}
+})
 
 type ToolbarAction = "roll" | "sort"
 interface ToolbarProps {
@@ -66,10 +78,37 @@ interface ToolbarProps {
 }
 const Toolbar: React.FC<ToolbarProps> = (props) => {
   const { onItemClick } = props
+  const { search, sortData } = useContext(OperationsHandlerContext)
+  const [sortOrder, setSortOrder] = useState<{ key: string; order: string }>({ key: "", order: "" })
+  let timer: NodeJS.Timeout
+
+  useEffect(() => {
+    if (!!sortOrder.key && !!sortOrder.key) sortData(sortOrder)
+  }, [sortOrder.key, sortOrder.order])
+
+  const onSortClick = (key: string) => {
+    setSortOrder({ key: key, order: sortOrder.key === key && sortOrder.order === "asc" ? "dec" : "asc" })
+  }
+
   return (
     <S.ToolbarContainer>
-      <div onClick={() => onItemClick("sort")}>First Name</div>
-      <div>Search</div>
+      <S.NameWithSort onClick={() => onSortClick("first_name")}>
+        <div>First Name</div>
+        {sortOrder.key === "first_name" && <FontAwesomeIcon icon={sortOrder.order === "asc" ? "caret-up" : "caret-down"} size={"2x"} />}
+      </S.NameWithSort>
+      <S.NameWithSort onClick={() => onSortClick("last_name")}>
+        <div>Last Name</div>
+        {sortOrder.key === "last_name" && <FontAwesomeIcon icon={sortOrder.order === "asc" ? "caret-up" : "caret-down"} size={"2x"} />}
+      </S.NameWithSort>
+      <S.SearchBar
+        placeholder="Search"
+        onChange={(e) => {
+          clearTimeout(timer)
+          timer = setTimeout(() => {
+            search(e.target.value)
+          }, 2000)
+        }}
+      />
       <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
     </S.ToolbarContainer>
   )
@@ -98,5 +137,13 @@ const S = {
       font-weight: ${FontWeight.strong};
       border-radius: ${BorderRadius.default};
     }
+  `,
+  SearchBar: styled.input`
+    border-radius: 5px;
+    height: 100%;
+    padding: 0 5px;
+  `,
+  NameWithSort: styled.div`
+    display: flex;
   `,
 }

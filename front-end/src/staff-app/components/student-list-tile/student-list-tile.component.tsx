@@ -1,16 +1,21 @@
-import React from "react"
+import React, { useContext } from "react"
 import styled from "styled-components"
 import { Spacing, BorderRadius, FontWeight } from "shared/styles/styles"
 import { Images } from "assets/images"
 import { Colors } from "shared/styles/colors"
 import { Person, PersonHelper } from "shared/models/person"
 import { RollStateSwitcher } from "staff-app/components/roll-state/roll-state-switcher.component"
+import { OperationsHandlerContext } from "staff-app/daily-care/daily-staff.context"
+import { RolllStateType } from "shared/models/roll"
 
 interface Props {
   isRollMode?: boolean
   student: Person
 }
+
 export const StudentListTile: React.FC<Props> = ({ isRollMode, student }) => {
+  const { onPresenceChange, studentsAttendanceMap } = useContext(OperationsHandlerContext)
+
   return (
     <S.Container>
       <S.Avatar url={Images.avatar}></S.Avatar>
@@ -19,7 +24,12 @@ export const StudentListTile: React.FC<Props> = ({ isRollMode, student }) => {
       </S.Content>
       {isRollMode && (
         <S.Roll>
-          <RollStateSwitcher />
+          <RollStateSwitcher
+            onStateChange={(next: RolllStateType) => {
+              onPresenceChange(next, student.id)
+            }}
+            initialState={studentsAttendanceMap && studentsAttendanceMap[student.id] !== undefined ? studentsAttendanceMap[student.id] : "unmark"}
+          />
         </S.Roll>
       )}
     </S.Container>
