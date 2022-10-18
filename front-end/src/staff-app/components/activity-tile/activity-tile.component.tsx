@@ -1,7 +1,7 @@
 import React from "react"
+import styled from "styled-components"
 
 import { Activity } from "shared/models/activity"
-import styled from "styled-components"
 import { Spacing, BorderRadius } from "shared/styles/styles"
 
 interface ActivityTileProps {
@@ -18,13 +18,20 @@ export const ActivityTile: React.FC<ActivityTileProps> = ({ activityData }) => {
   )
   if (activityData?.entity) {
     return (
-      <S.ActivityTile>
-        <S.Index>{activityData.entity.name}</S.Index>
-        <p>{new Date(activityData.date).toDateString()}</p>
-        <p>{attendanceData.present}</p>
-        <p>{attendanceData.late}</p>
-        <p>{attendanceData.absent}</p>
-      </S.ActivityTile>
+      <>
+        {activityData.entity.name}
+        <S.ActivityTile>
+          <p>
+            <b>Date:</b>
+            {new Date(activityData.date).toDateString()}
+          </p>
+          <S.AttendanceContainer>
+            <S.Present>{attendanceData.present}</S.Present>
+            <S.Late>{attendanceData.late}</S.Late>
+            <S.Absent>{attendanceData.absent}</S.Absent>
+          </S.AttendanceContainer>
+        </S.ActivityTile>
+      </>
     )
   }
   return null
@@ -36,14 +43,44 @@ const S = {
     border-radius: ${BorderRadius.default};
     background-color: #d3d3d3;
     padding: 5px;
+    margin: 10px;
   `,
-  Index: styled.div`
-    background-color: blueviolet;
+  AttendanceContainer: styled.div`
+    display: flex;
+    width: 50%;
+    justify-content: space-evenly;
+  `,
+  Present: styled.p`
+    background-color: #13943b;
     color: white;
     border-radius: ${BorderRadius.rounded};
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: ${Spacing.u1};
+    margin: 0;
+    height: ${Spacing.u10};
+    width: ${Spacing.u10};
+  `,
+  Absent: styled.p`
+    background-color: #9b9b9b;
+    color: white;
+    border-radius: ${BorderRadius.rounded};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    height: ${Spacing.u10};
+    width: ${Spacing.u10};
+  `,
+  Late: styled.p`
+    background-color: #f5a623;
+    color: white;
+    border-radius: ${BorderRadius.rounded};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    height: ${Spacing.u10};
+    width: ${Spacing.u10};
   `,
 }
