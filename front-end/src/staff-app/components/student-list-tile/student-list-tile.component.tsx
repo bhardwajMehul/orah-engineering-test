@@ -6,7 +6,7 @@ import { Colors } from "shared/styles/colors"
 import { Person, PersonHelper } from "shared/models/person"
 import { RollStateSwitcher } from "staff-app/components/roll-state/roll-state-switcher.component"
 import { OperationsHandlerContext } from "staff-app/daily-care/daily-staff.context"
-import { RolllStateType } from "shared/models/roll"
+import { RollStateType } from "shared/models/roll"
 
 interface Props {
   isRollMode?: boolean
@@ -25,7 +25,7 @@ export const StudentListTile: React.FC<Props> = ({ isRollMode, student }) => {
       {isRollMode && (
         <S.Roll>
           <RollStateSwitcher
-            onStateChange={(next: RolllStateType) => {
+            onStateChange={(next: RollStateType) => {
               onPresenceChange(next, student.id)
             }}
             initialState={studentsAttendanceMap && studentsAttendanceMap[student.id] !== undefined ? studentsAttendanceMap[student.id] : "unmark"}

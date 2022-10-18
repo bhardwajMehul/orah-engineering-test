@@ -10,7 +10,7 @@ import { Person } from "shared/models/person"
 import { useApi } from "shared/hooks/use-api"
 import { StudentListTile } from "staff-app/components/student-list-tile/student-list-tile.component"
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
-import { OperationsHandlerContext } from "./daily-staff.context"
+import { OperationsHandlerContext } from "staff-app/daily-care/daily-staff.context"
 
 export const HomeBoardPage: React.FC = memo(() => {
   const [isRollMode, setIsRollMode] = useState(false)
@@ -83,7 +83,7 @@ const Toolbar: React.FC<ToolbarProps> = (props) => {
   let timer: NodeJS.Timeout
 
   useEffect(() => {
-    if (!!sortOrder.key && !!sortOrder.key) sortData(sortOrder)
+    if (!!sortOrder.key && !!sortOrder.order) sortData(sortOrder)
   }, [sortOrder.key, sortOrder.order])
 
   const onSortClick = (key: string) => {
@@ -145,5 +145,6 @@ const S = {
   `,
   NameWithSort: styled.div`
     display: flex;
+    align-items: center;
   `,
 }

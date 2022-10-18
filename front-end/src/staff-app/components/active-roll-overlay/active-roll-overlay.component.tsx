@@ -3,7 +3,7 @@ import styled from "styled-components"
 import Button from "@material-ui/core/Button"
 import { BorderRadius, Spacing } from "shared/styles/styles"
 import { RollStateList } from "staff-app/components/roll-state/roll-state-list.component"
-import { RolllStateType } from "shared/models/roll"
+import { RollStateType } from "shared/models/roll"
 import { OperationsHandlerContext } from "staff-app/daily-care/daily-staff.context"
 import { useApi } from "shared/hooks/use-api"
 
@@ -15,7 +15,7 @@ interface Props {
 
 export const ActiveRollOverlay: React.FC<Props> = (props) => {
   const { isActive, onItemClick } = props
-  const [attendance, setAttendance] = useState<{ [key in RolllStateType]: number }>({ unmark: 0, late: 0, present: 0, absent: 0 })
+  const [attendance, setAttendance] = useState<{ [key in RollStateType]: number }>({ unmark: 0, late: 0, present: 0, absent: 0 })
   const { setAttendanceDispatchAction, sortData, totalStudentsCount, getAttendanceDataWithMapping } = useContext(OperationsHandlerContext)
 
   const [saveRollData, data] = useApi<{ success: boolean }>({ url: "save-roll" })
